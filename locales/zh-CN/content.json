@@ -274,5 +274,16 @@
     "overviewNote": "集中到期与缓存不可用是不同触发原因，但都会把流量推向后端。TTL 随机抖动有助于缓解集中到期，却不能修复缓存故障或弥补数据库容量不足。",
     "supplement": "<section class=\"panel supplement\"><h2>降低发生概率并限制故障影响</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">措施</th><th scope=\"col\">主要作用</th><th scope=\"col\">适用边界</th></tr></thead><tbody><tr><th scope=\"row\">TTL 随机抖动</th><td>分散原本会同时到期的一批键。</td><td>不能单独防止缓存故障或热门键击穿。</td></tr><tr><th scope=\"row\">分阶段预热</th><td>重启后逐步恢复重要缓存项。</td><td>需限制速率，避免预热本身制造流量峰值。</td></tr><tr><th scope=\"row\">并发限制与背压</th><td>在流量突增时限制后端负载和排队请求。</td><td>部分请求可能等待或收到受控错误。</td></tr><tr><th scope=\"row\">熔断与降级</th><td>暂停调用不健康依赖，并选择预先定义的响应。</td><td>降级数据可能过时、不完整或不可用，应符合业务安全要求。</td></tr></tbody></table></div><p class=\"callout\">单个热门键到期时，请求合并可减少重复查询。大量键失效或缓存故障时，应组合使用 TTL 抖动、后端保护和恢复控制。</p></section>",
     "footer": "本页介绍集中到期和缓存不可用的情况。降级选择、恢复节奏和旧数据策略取决于具体服务。"
+  },
+  "httpsTls": {
+    "title": "HTTPS 与 TLS 握手",
+    "lead": "HTTPS 将 HTTP 放在传输层安全协议（TLS）保护的连接中。浏览器先验证服务器身份，再使用协商得到的密钥加密请求和响应。本页以基于 TCP、使用证书认证与临时密钥交换的 TLS 1.3 完整握手为例；不包含会话恢复、0-RTT 和客户端证书认证。",
+    "overview": "flowchart LR\n B[浏览器] -->|查询域名| D[DNS 解析器]\n D -->|IP 地址| B\n B -->|建立 TCP 并发起 TLS 握手| S[HTTPS 服务器]\n S -->|证书与握手证明| B\n B -->|握手后发送加密请求| S\n S -->|加密响应| B",
+    "overviewNote": "证书验证发生在浏览器本地，证书颁发机构不需要参与每次握手。ServerHello 之后的握手消息由握手密钥加密；HTTP 数据使用单独派生的应用流量密钥。",
+    "supplement": "<section class=\"panel supplement\"><h2>证书、密钥交换与数据加密各做什么</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">机制</th><th scope=\"col\">作用</th><th scope=\"col\">边界</th></tr></thead><tbody><tr><th scope=\"row\">证书链与域名检查</th><td>将服务器公钥与请求的域名及信任体系关联。</td><td>不能证明网站内容或交易一定安全。</td></tr><tr><th scope=\"row\">临时密钥交换</th><td>双方独立计算共享秘密，再派生流量密钥。</td><td>服务器证书私钥与会话流量密钥是不同的密钥；临时秘密正确销毁后可提供前向保密。</td></tr><tr><th scope=\"row\">CertificateVerify 与 Finished</th><td>证明私钥持有并认证握手上下文，防止握手被篡改。</td><td>不能省略证书与请求域名的匹配验证。</td></tr><tr><th scope=\"row\">认证加密</th><td>保护 TLS 记录内容的机密性和完整性。</td><td>不隐藏所有网络元数据，也不防止端点自身泄露数据。</td></tr></tbody></table></div></section><section class=\"panel supplement\"><h2>不同连接方式的边界</h2><ul><li><strong>TLS 1.2：</strong>握手顺序和密钥协商方式与本页不同，不应直接套用 TLS 1.3 图。</li><li><strong>会话恢复：</strong>可使用先前建立的预共享密钥，减少认证工作；不必每次重新发送证书。</li><li><strong>0-RTT：</strong>部分恢复连接可提前发送数据，但存在重放风险；付款等非幂等操作不应直接假定早期数据不可重放。</li><li><strong>HTTP/3：</strong>使用基于 UDP 的 QUIC 并集成 TLS 1.3，不经过本页的 TCP 握手。</li><li><strong>失败处理：</strong>证书、算法或握手校验失败时应停止连接，排查域名、时间、证书链与服务器配置，而非绕过校验。</li></ul><p>参考：<a href=\"https://www.rfc-editor.org/rfc/rfc8446.html\">RFC 8446：TLS 1.3</a> · <a href=\"https://www.rfc-editor.org/rfc/rfc9110.html#section-4.2.2\">HTTPS URI</a> · <a href=\"https://www.rfc-editor.org/rfc/rfc9114.html\">HTTP/3</a></p></section>",
+    "footer": "本页简化展示基于 TCP 的 TLS 1.3 完整握手。继续了解 <a href=\"session-cookie.html\">Session Cookie 登录</a> 与 <a href=\"oidc-login.html\">OpenID Connect 登录</a>；TLS 身份认证不等同于应用用户登录。",
+    "heading": "HTTPS 与 TLS 握手",
+    "overviewKicker": "TLS 1.3",
+    "overviewTitle": "整体流程：从连接到加密 HTTP"
   }
 }

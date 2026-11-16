@@ -1,4 +1,5 @@
 const topics = [
+  { key: 'httpsTls', url: 'https-tls.html', updated: '2026-11-16', category: 'networking' },
   { key: 'releaseMethods', url: 'release-methods.html', updated: '2026-11-10', category: 'engineering' },
   { key: 'waterfall', url: 'waterfall.html', updated: '2026-11-10', category: 'engineering' },
   { key: 'agile', url: 'agile.html', updated: '2026-11-10', category: 'engineering' },

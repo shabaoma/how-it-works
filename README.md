@@ -12,6 +12,10 @@ npm run serve
 
 ## Topics
 
+**Networking**
+
+- HTTPS and the TLS handshake
+
 **Software engineering**
 
 - How software releases work

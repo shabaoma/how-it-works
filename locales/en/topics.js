@@ -1,4 +1,5 @@
 module.exports = {
+  httpsTls: {"label": "HTTPS and TLS handshake", "title": "HTTPS and the TLS handshake", "description": "From opening a connection to encrypted HTTP, learn how TLS 1.3 authenticates a server and derives traffic keys."},
   cacheAvalanche: {"label": "Cache avalanche", "title": "Cache avalanche", "description": "How many cache entries expiring together or a cache outage can flood the backing service, and how to contain the surge."},
   cacheBreakdown: {"label": "Cache breakdown", "title": "Cache breakdown", "description": "How concurrent requests for an expired hot key can overload the database, and how request coalescing and stale responses can limit the stampede."},
   waterfall: { label: 'Waterfall development', title: 'Waterfall development flow', description: 'Follow requirements, design, implementation, verification and release through reviewed phases.' },
