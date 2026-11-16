@@ -21,7 +21,7 @@ const topics = [
   { key: 'socialNetwork', url: 'social-network.html', updated: '2026-11-08', category: 'distributed' },
   { key: 'cacheInvalidation', url: 'cache-invalidation.html', updated: '2026-11-08', category: 'distributed' },
   { key: 'threeDSecure', url: '3d-secure.html', updated: '2026-11-08', category: 'payments' },
-  { key: 'paymentIdempotency', url: 'payment-idempotency.html', updated: '2026-11-08', category: 'payments' },
+  { key: 'paymentIdempotency', url: 'payment-idempotency.html', updated: '2026-11-16', category: 'payments' },
   { key: 'awsSts', url: 'aws-sts.html', updated: '2026-11-08', category: 'cloud' },
   { key: 'awsIam', url: 'aws-iam.html', updated: '2026-11-08', category: 'cloud' },
   { key: 'awsSsm', url: 'aws-ssm.html', updated: '2026-11-08', category: 'cloud' }
