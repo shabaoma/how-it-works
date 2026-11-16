@@ -12,7 +12,7 @@ const topics = [
   { key: 'accessSecretToken', url: 'access-secret-token.html', updated: '2026-11-08', category: 'identity' },
   { key: 'sso', url: 'sso.html', updated: '2026-11-08', category: 'identity' },
   { key: 'oauthPkce', url: 'oauth-pkce.html', updated: '2026-11-08', category: 'identity' },
-  { key: 'oidcLogin', url: 'oidc-login.html', updated: '2026-11-08', category: 'identity' },
+  { key: 'oidcLogin', url: 'oidc-login.html', updated: '2026-11-16', category: 'identity' },
   { key: 'emailCode', url: 'email-code.html', updated: '2026-11-08', category: 'identity' },
   { key: 'codexMcp', url: 'codex-mcp.html', updated: '2026-11-08', category: 'ai' },
   { key: 'webhook', url: 'webhook.html', updated: '2026-11-08', category: 'integration' },
