@@ -4,7 +4,7 @@ const topics = [
   { key: 'waterfall', url: 'waterfall.html', updated: '2026-11-10', category: 'engineering' },
   { key: 'agile', url: 'agile.html', updated: '2026-11-10', category: 'engineering' },
   { key: 'cognitoIdentityPool', url: 'cognito-identity-pool.html', updated: '2026-11-09', category: 'cloud' },
-  { key: 'cacheBreakdown', url: 'cache-breakdown.html', updated: '2026-11-25', category: 'distributed' },
+  { key: 'cacheBreakdown', url: 'cache-stampede.html', updated: '2026-11-25', category: 'distributed' },
   { key: 'cacheAvalanche', url: 'cache-avalanche.html', updated: '2026-11-25', category: 'distributed' },
   { key: 'cachePenetration', url: 'cache-penetration.html', updated: '2026-11-25', category: 'distributed' },
   { key: 'isuconAgents', url: 'isucon-multi-agent.html', updated: '2026-11-09', category: 'ai' },
