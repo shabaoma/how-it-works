@@ -204,12 +204,12 @@
   "cachePenetration": {
     "title": "缓存穿透",
     "heading": "缓存穿透：不存在的数据为何反复访问数据库",
-    "lead": "当请求的记录不存在，应用查缓存未命中、再查数据库也没有结果。如果没有缓存这个结果，后续相同请求会重复访问数据库；大量请求可能压垮数据库。下面以按需加载缓存的商品查询为例。",
+    "lead": "缓存穿透（Cache penetration）指请求不存在的数据：应用查缓存未命中、再查数据库也没有结果。如果没有缓存这个结果，后续相同请求会重复访问数据库；大量请求可能压垮数据库。下面以按需加载缓存的商品查询为例。",
     "footer": "本页以缓存旁路读取为例。继续了解 <a href=\"cache-invalidation.html\">缓存更新与失效</a>。",
     "overviewTitle": "整体流程：未命中后如何避免重复查询",
     "overview": "flowchart LR\n    U[客户端] -->|查询商品| A[应用]\n    A -->|查询键| C[缓存]\n    C -.->|未命中| A\n    A -->|查询记录| D[(数据库)]\n    D -->|记录或不存在| A\n    A -.->|按策略缓存结果| C\n    A -->|返回结果| U",
     "overviewNote": "虚线表示条件路径：缓存未命中时才查询数据库；是否回填空值取决于策略。缓存正常命中和穿透都可能从未命中开始，但穿透的关键是不存在的记录反复落到数据库。",
-    "supplement": "<section class=\"panel supplement\"><h2>防护方法与边界</h2><ul><li><strong>空值缓存：</strong>只在权威数据源确认不存在后写入明确的空值标记，设置较短的生存时间（TTL）；数据库超时或错误不能当作不存在。大量不同的不存在键仍会消耗缓存空间并首次访问数据库。</li><li><strong>布隆过滤器：</strong>在查询前判断键是否可能存在；可能误报存在，所以仍要查缓存或数据库。只有过滤器完整且与数据更新正确同步时，判定不存在才能安全拦截。新增记录前应先让过滤器包含该键，重建或异常期间应有回退策略。</li><li><strong>输入校验与限流：</strong>拒绝格式无效的键并限制请求速率；合法格式但不存在的键仍可能穿透，需要结合其他措施。</li><li><strong>新增与过期：</strong>创建原本不存在的记录后应删除或更新对应空值标记；删除失败、并发回填或复制延迟仍可能导致短暂误报不存在，应按业务一致性要求处理。</li></ul><p>缓存击穿通常指热点键过期后并发回源；缓存雪崩通常指大量键同时失效或缓存不可用。它们与缓存穿透的触发条件不同。</p></section>"
+    "supplement": "<section class=\"panel supplement\"><h2>防护方法与边界</h2><ul><li><strong>空值缓存：</strong>只在权威数据源确认不存在后写入明确的空值标记，设置较短的生存时间（TTL）；数据库超时或错误不能当作不存在。大量不同的不存在键仍会消耗缓存空间并首次访问数据库。</li><li><strong>布隆过滤器：</strong>在查询前判断键是否可能存在；可能误报存在，所以仍要查缓存或数据库。只有过滤器完整且与数据更新正确同步时，判定不存在才能安全拦截。新增记录前应先让过滤器包含该键，重建或异常期间应有回退策略。</li><li><strong>输入校验与限流：</strong>拒绝格式无效的键并限制请求速率；合法格式但不存在的键仍可能穿透，需要结合其他措施。</li><li><strong>新增与过期：</strong>创建原本不存在的记录后应删除或更新对应空值标记；删除失败、并发回填或复制延迟仍可能导致短暂误报不存在，应按业务一致性要求处理。</li></ul><p>本项目用缓存击穿（Cache stampede）描述热门键过期后的并发回源，用缓存雪崩（Cache avalanche）描述大量键同时失效或缓存不可用。英文 stampede 也可泛指并发回源，含义可能重叠；缓存穿透则关注不存在的记录被反复查询。</p></section>"
   },
   "cognitoIdentityPool": {
     "title": "Cognito Identity ID 与身份池",
@@ -256,23 +256,23 @@
   "cacheBreakdown": {
     "title": "缓存击穿",
     "heading": "缓存击穿",
-    "lead": "缓存击穿也常称为缓存惊群：热门键过期时，大量请求同时未命中缓存，并一起查询数据库。应用、缓存和数据库需要协同回填；请求合并或在允许时短暂返回旧值可以减少重复查询，但各自都有适用边界。",
+    "lead": "缓存击穿（Cache stampede）在本页指热门键过期时，大量请求同时未命中缓存，并一起查询数据库。应用、缓存和数据库需要协同回填；请求合并或在允许时短暂返回旧值可以减少重复查询，但各自都有适用边界。",
     "overviewKicker": "缓存模式",
     "overviewTitle": "请求与后端如何交互",
     "overview": "flowchart LR\n U[并发请求] -->|读取热门键| A[应用]\n A -->|键过期或缺失| C[(缓存)]\n A -->|单次回填| D[(数据库)]\n D -->|返回新值| A\n A -->|设置过期时间| C\n A -->|共享结果| U\n A -.->|合并并发未命中| L[请求协调器]",
     "overviewNote": "只有未命中才会触发回填。协调器可以是进程内 singleflight，也可以是分布式锁；协调范围和故障处理取决于实现。",
-    "supplement": "<section class=\"panel supplement\"><h2>减少缓存惊群的常见方法</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">方法</th><th scope=\"col\">作用</th><th scope=\"col\">适用边界</th></tr></thead><tbody><tr><th scope=\"row\">请求合并</th><td>同一键的并发请求共享一次正在进行的加载。</td><td>进程内协调无法覆盖其他应用实例。</td></tr><tr><th scope=\"row\">分布式锁</th><td>在多个实例间选出一个回填者。</td><td>需要过期时间、有限等待、故障恢复并避免旧持锁者写回数据。</td></tr><tr><th scope=\"row\">过期后异步刷新</th><td>返回近期旧值的同时，由一个工作者刷新。</td><td>仅在业务允许陈旧数据时使用；限制旧值时长并保证刷新持续推进。</td></tr><tr><th scope=\"row\">提前刷新</th><td>热门值硬过期前尝试刷新。</td><td>增加后台负载，不能替代未命中时的请求合并。</td></tr></tbody></table></div><p class=\"callout\">这些方法针对同一个键的并发未命中。大量不同键同时过期属于缓存雪崩，需要更广泛的负载保护。</p></section>",
+    "supplement": "<section class=\"panel supplement\"><h2>减少缓存惊群的常见方法</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">方法</th><th scope=\"col\">作用</th><th scope=\"col\">适用边界</th></tr></thead><tbody><tr><th scope=\"row\">请求合并</th><td>同一键的并发请求共享一次正在进行的加载。</td><td>进程内协调无法覆盖其他应用实例。</td></tr><tr><th scope=\"row\">分布式锁</th><td>在多个实例间选出一个回填者。</td><td>需要过期时间、有限等待、故障恢复并避免旧持锁者写回数据。</td></tr><tr><th scope=\"row\">过期后异步刷新</th><td>返回近期旧值的同时，由一个工作者刷新。</td><td>仅在业务允许陈旧数据时使用；限制旧值时长并保证刷新持续推进。</td></tr><tr><th scope=\"row\">提前刷新</th><td>热门值硬过期前尝试刷新。</td><td>增加后台负载，不能替代未命中时的请求合并。</td></tr></tbody></table></div><p class=\"callout\">这些方法针对同一个键的并发未命中。本项目用缓存雪崩（Cache avalanche）描述大量键集中失效或缓存故障，需要更广泛的负载保护。英文 stampede 也可泛指并发回源，因此这两个术语的含义可能重叠，并非互斥分类。</p></section>",
     "footer": "本页展示常见 Cache-Aside 防护方式。协调范围、可接受的陈旧度和降级行为取决于系统。"
   },
   "cacheAvalanche": {
     "title": "缓存雪崩",
     "heading": "缓存雪崩",
-    "lead": "缓存雪崩指大量缓存键同时不可用，常见原因是过期时间集中或缓存服务故障，导致后端收到大量读请求。应用、缓存、数据库和运维团队需要降低同时失效的概率，并在负载激增时限制影响。",
+    "lead": "缓存雪崩（Cache avalanche）指大量缓存键同时不可用，常见原因是过期时间集中或缓存服务故障，导致后端收到大量读请求。应用、缓存、数据库和运维团队需要降低同时失效的概率，并在负载激增时限制影响。",
     "overviewKicker": "缓存模式",
     "overviewTitle": "请求与后端如何交互",
     "overview": "flowchart LR\n T[大量键同时过期] -->|并发未命中| A[应用]\n X[缓存服务故障] -->|绕过缓存或报错| A\n A -->|读请求激增| D[(数据库)]\n A -->|随机过期与预热| C[(缓存)]\n A -.->|限流与熔断| G[负载保护]\n G -->|受控降级| U[用户]",
     "overviewNote": "集中到期与缓存不可用是不同触发原因，但都会把流量推向后端。TTL 随机抖动有助于缓解集中到期，却不能修复缓存故障或弥补数据库容量不足。",
-    "supplement": "<section class=\"panel supplement\"><h2>降低发生概率并限制故障影响</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">措施</th><th scope=\"col\">主要作用</th><th scope=\"col\">适用边界</th></tr></thead><tbody><tr><th scope=\"row\">TTL 随机抖动</th><td>分散原本会同时到期的一批键。</td><td>不能单独防止缓存故障或热门键击穿。</td></tr><tr><th scope=\"row\">分阶段预热</th><td>重启后逐步恢复重要缓存项。</td><td>需限制速率，避免预热本身制造流量峰值。</td></tr><tr><th scope=\"row\">并发限制与背压</th><td>在流量突增时限制后端负载和排队请求。</td><td>部分请求可能等待或收到受控错误。</td></tr><tr><th scope=\"row\">熔断与降级</th><td>暂停调用不健康依赖，并选择预先定义的响应。</td><td>降级数据可能过时、不完整或不可用，应符合业务安全要求。</td></tr></tbody></table></div><p class=\"callout\">单个热门键到期时，请求合并可减少重复查询。大量键失效或缓存故障时，应组合使用 TTL 抖动、后端保护和恢复控制。</p></section>",
+    "supplement": "<section class=\"panel supplement\"><h2>降低发生概率并限制故障影响</h2><div class=\"table-scroll\"><table><thead><tr><th scope=\"col\">措施</th><th scope=\"col\">主要作用</th><th scope=\"col\">适用边界</th></tr></thead><tbody><tr><th scope=\"row\">TTL 随机抖动</th><td>分散原本会同时到期的一批键。</td><td>不能单独防止缓存故障或热门键击穿。</td></tr><tr><th scope=\"row\">分阶段预热</th><td>重启后逐步恢复重要缓存项。</td><td>需限制速率，避免预热本身制造流量峰值。</td></tr><tr><th scope=\"row\">并发限制与背压</th><td>在流量突增时限制后端负载和排队请求。</td><td>部分请求可能等待或收到受控错误。</td></tr><tr><th scope=\"row\">熔断与降级</th><td>暂停调用不健康依赖，并选择预先定义的响应。</td><td>降级数据可能过时、不完整或不可用，应符合业务安全要求。</td></tr></tbody></table></div><p class=\"callout\">单个热门键到期引发缓存击穿（Cache stampede）时，请求合并可减少重复查询。大量键失效或缓存故障时，应组合使用 TTL 抖动、后端保护和恢复控制。缓存穿透（Cache penetration）则关注不存在的记录被反复查询。</p></section>",
     "footer": "本页介绍集中到期和缓存不可用的情况。降级选择、恢复节奏和旧数据策略取决于具体服务。"
   },
   "httpsTls": {
