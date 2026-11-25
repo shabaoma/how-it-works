@@ -68,10 +68,6 @@ module.exports = function (config) {
   config.addGlobalData('localizedPages', localizedPages);
   config.addGlobalData('legacyPages', [
     { url: 'index.html', target: 'en/index.html', lang: 'en' },
-    { url: 'cache-breakdown.html', target: `${defaultLocale.prefix}/cache-stampede.html`, lang: defaultLocale.code },
-    ...locales.filter(locale => locale.prefix).map(locale => ({
-      url: `${locale.prefix}/cache-breakdown.html`, target: 'cache-stampede.html', lang: locale.code, assetPrefix: '../'
-    })),
     ...topicDefinitions.map(topic => ({ url: topic.url, target: `${defaultLocale.prefix}/${topic.url}`, lang: defaultLocale.code }))
   ]);
   config.addFilter('jsonForScript', value => JSON.stringify(value).replace(/</g, '\\u003c'));
